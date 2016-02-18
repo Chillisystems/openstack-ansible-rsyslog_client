@@ -13,20 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Stop rsyslog
-  service:
-    name: "rsyslog"
-    state: "stopped"
-  failed_when: false
-  tags:
-    - rsyslog-client-config
-
 - name: Rsyslog Setup
   copy:
     src: "50-default.conf"
     dest: "/etc/rsyslog.d/50-default.conf"
     owner: "root"
     group: "root"
+  register: syslog_configured
   tags:
     - rsyslog-client-config
 
@@ -86,6 +79,7 @@
 - name: Start rsyslog
   service:
     name: "rsyslog"
-    state: "started"
+    state: "restarted"
+  when: syslog_configured|changed
   tags:
     - rsyslog-client-config
